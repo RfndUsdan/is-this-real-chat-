@@ -8,9 +8,12 @@ adalah **prediksi model berdasarkan pola pada dataset**, bukan verifikasi
 fakta dan bukan bukti bahwa suatu klaim benar atau salah.
 
 > **Status repository:** Phase 0 (repository inspection & planning)
-> selesai. Pipeline data, model, API, dan dashboard **belum
-> diimplementasikan**. Saat ini tidak ada dataset, model, artifact, atau
-> metrik evaluasi yang tersedia atau diklaim.
+> selesai. Phase 1 Stage 1 (dataset discovery/audit) selesai; dataset
+> belum disetujui. Lihat
+> [ADR 0002](docs/decisions/0002-phase-1-stage-1-dataset-discovery.md).
+> Pipeline data, model, API, dan dashboard **belum diimplementasikan**.
+> Tidak ada file dataset, model, artifact, atau metrik evaluasi yang
+> tersedia atau diklaim.
 
 ## Responsible use
 
@@ -112,7 +115,7 @@ Copy-Item .env.example .env
 | Phase | Status | Catatan |
 | --- | --- | --- |
 | 0 — Repository inspection & planning | Done | Struktur minimum, dokumentasi fondasi, dan rencana tersedia |
-| 1 — Dataset audit & pipeline | Not started | Belum ada dataset yang diunduh atau diverifikasi |
+| 1 — Dataset audit & pipeline | In progress (Stage 1) | Audit metadata/lisensi selesai; file dataset belum diakses; dataset belum disetujui |
 | 2 — Baseline NLP | Not started | Menunggu dataset dan split yang tervalidasi |
 | 3 — Advanced model & optimization | Not started | Menunggu baseline |
 | 4 — Advanced content intelligence | Not started | Fitur opsional, tidak menghambat baseline |
@@ -124,14 +127,16 @@ Status terbaru dan acceptance criteria ada di [ROADMAP.md](ROADMAP.md).
 
 ## Langkah berikutnya
 
-Phase 1: audit dataset sebelum mengunduh data. Verifikasi sumber,
-lisensi, provenance, schema aktual, definisi label, duplikasi, dan
-potensi leakage. Jangan mengarang nama kolom, label, jumlah data, atau
-metrik.
+Phase 1: putuskan dataset kandidat utama dan ajukan akses file. Stage 1
+sudah mengaudit metadata, lisensi, provenance, dan dokumentasi label;
+file aktual, deduplikasi, distribusi kelas, dan split belum diverifikasi.
+Jangan mengarang nama kolom, label, jumlah data, atau metrik.
 
 ## Keterbatasan
 
-- Belum ada dataset yang diaudit atau diproses.
+- Metadata dataset sudah diaudit pada Stage 1; file dataset belum
+  diunduh atau diverifikasi.
+- Belum ada dataset yang disetujui untuk pipeline.
 - Belum ada model, artifact, atau hasil evaluasi.
 - Belum ada API, database, atau dashboard.
 - Label taxonomy dan split strategy belum final.

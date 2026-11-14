@@ -1,8 +1,10 @@
 # HoaxScope --- Development Roadmap
 
 > Status awal semua fase adalah **Not started**. Perbarui hanya
-> berdasarkan implementasi dan validasi aktual. Per 2026-11-13, Phase 0
-> berstatus **Done**; Phase 1–7 belum dimulai.
+> berdasarkan implementasi dan validasi aktual. Per 2026-11-14, Phase 0
+> berstatus **Done**; Phase 1 berstatus **In progress** (Stage 1
+> discovery/audit selesai); Phase 2–7 belum dimulai. Tidak ada dataset
+> yang disetujui atau diunduh.
 
 ## Prinsip
 
@@ -28,6 +30,24 @@ penting diubah/dihapus tanpa alasan. - \[x\] Rencana fase berikutnya
 tersedia. - \[x\] Tidak membangun seluruh aplikasi pada fase ini.
 
 ## Phase 1 --- Dataset audit & pipeline
+
+**Status:** In progress (2026-11-14). Stage 1 discovery/audit selesai;
+keputusan dataset masih menunggu persetujuan pengguna dan akses file.
+Evidence: [docs/decisions/0002-phase-1-stage-1-dataset-discovery.md](docs/decisions/0002-phase-1-stage-1-dataset-discovery.md).
+Tidak ada dataset yang diunduh atau disetujui; acceptance criteria di bawah
+belum terpenuhi.
+
+**Stage 1 evidence (2026-11-14):**
+
+- Metadata, lisensi, provenance, akses, dan dokumentasi schema/label kandidat
+  telah diperiksa: BRIN Dataverse v2.1, HF `fakenews-mafindo`, HF
+  `id-hoax-report`, dan `data.go.id` Jabar.
+- BRIN Dataverse v2.1 direkomendasikan sebagai kandidat utama kondisional;
+  HF `fakenews-mafindo` hanya fallback; HF `id-hoax-report` eksploratif;
+  `data.go.id` Jabar tidak disetujui.
+- File dataset tidak diunduh; row count, distribusi kelas, duplikasi, dan
+  schema aktual belum diverifikasi.
+- Loader, data validation, preprocessing, split, dan EDA belum dibuat.
 
 **Tujuan:** dataset tervalidasi dan dapat ditelusuri. - Verifikasi
 sumber, lisensi, provenance, schema, dan label. - Buat loader CSV/JSON

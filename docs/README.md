@@ -22,3 +22,6 @@ Jangan menyalin isi dokumen root ke sini tanpa alasan. Jika sebuah
 dokumen perlu dipecah, buat satu sumber kanonik dan tautkan dari tempat
 lain. Keputusan tentang lokasi dokumentasi dicatat di
 [decisions/0001-phase-0-repository-foundation.md](decisions/0001-phase-0-repository-foundation.md).
+
+Decision record Phase 1 Stage 1:
+[decisions/0002-phase-1-stage-1-dataset-discovery.md](decisions/0002-phase-1-stage-1-dataset-discovery.md).

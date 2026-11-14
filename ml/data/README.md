@@ -12,8 +12,10 @@ ml/data/
 
 ## Status
 
-Belum ada dataset yang diunduh, disalin, atau diaudit. Folder hanya
-berisi penanda `.gitkeep`.
+Belum ada file dataset yang diunduh, disalin, atau diproses. Audit
+metadata/lisensi Stage 1 sudah selesai; hasil dan rekomendasinya ada di
+[`docs/decisions/0002-phase-1-stage-1-dataset-discovery.md`](../../docs/decisions/0002-phase-1-stage-1-dataset-discovery.md).
+Folder ini hanya berisi penanda `.gitkeep`.
 
 ## Aturan
 
@@ -30,12 +32,14 @@ berisi penanda `.gitkeep`.
 
 ## Kandidat sumber
 
-Kandidat sumber dan hal yang harus diperiksa tercantum di
-[`DATASET.md`](../../DATASET.md). Daftar tersebut belum merupakan
+Kandidat yang diperiksa pada Stage 1 beserta hasil dan rekomendasinya ada di
+[ADR 0002](../../docs/decisions/0002-phase-1-stage-1-dataset-discovery.md).
+[`DATASET.md`](../../DATASET.md) tetap menjadi register kanonik dan akan
+diperbarui setelah ada dataset yang disetujui. Daftar tersebut belum merupakan
 konfirmasi lisensi atau persetujuan penggunaan.
 
 ## Langkah berikutnya
 
-Phase 1 akan memverifikasi sumber, membuat loader dan schema validation,
-menjalankan audit kualitas data, serta mencatat split strategy dan
-provenance sebelum training dimulai.
+Phase 1 menunggu keputusan dataset dan akses file. Setelah itu baru
+dibuat loader, schema validation, audit kualitas data, serta pencatatan
+split strategy dan provenance sebelum training dimulai.
