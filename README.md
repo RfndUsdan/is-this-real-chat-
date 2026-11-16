@@ -7,13 +7,14 @@ berbahasa Indonesia menggunakan NLP dan machine learning. Hasil sistem
 adalah **prediksi model berdasarkan pola pada dataset**, bukan verifikasi
 fakta dan bukan bukti bahwa suatu klaim benar atau salah.
 
-> **Status repository:** Phase 0 (repository inspection & planning)
-> selesai. Phase 1 Stage 1 (dataset discovery/audit) selesai; dataset
-> belum disetujui. Lihat
-> [ADR 0002](docs/decisions/0002-phase-1-stage-1-dataset-discovery.md).
-> Pipeline data, model, API, dan dashboard **belum diimplementasikan**.
-> Tidak ada file dataset, model, artifact, atau metrik evaluasi yang
-> tersedia atau diklaim.
+> **Status repository:** Phase 0 selesai. Phase 1 Stage 1 (discovery)
+> dan Stage 2 (dataset selection/audit) selesai; dataset Mendeley
+> 600-news berstatus **CONDITIONALLY APPROVED**. Lihat
+> [ADR 0003](docs/decisions/0003-dataset-selection.md). Stage 3 (loader,
+> validation, preprocessing, split) **belum dimulai**. Pipeline data,
+> model, API, dan dashboard belum diimplementasikan. Tidak ada file
+> dataset, model, artifact, atau metrik evaluasi di repository; audit
+> memakai salinan sementara di luar repo.
 
 ## Responsible use
 
@@ -30,7 +31,7 @@ Gunakan istilah seperti `predicted_label`, `model_confidence`, dan
 - [DEVELOPMENT.md](DEVELOPMENT.md) — spesifikasi teknis dan tahapan
   implementasi.
 - [ARCHITECTURE.md](ARCHITECTURE.md) — rancangan arsitektur.
-- [DATASET.md](DATASET.md) — kebijakan dan template audit dataset.
+- [DATASET.md](DATASET.md) — register, audit, dan governance dataset.
 - [ROADMAP.md](ROADMAP.md) — status dan acceptance criteria per fase.
 - [AGENTS.md](AGENTS.md) — aturan kerja untuk coding agent.
 - [docs/README.md](docs/README.md) — indeks dokumentasi dan decision
@@ -115,8 +116,8 @@ Copy-Item .env.example .env
 | Phase | Status | Catatan |
 | --- | --- | --- |
 | 0 — Repository inspection & planning | Done | Struktur minimum, dokumentasi fondasi, dan rencana tersedia |
-| 1 — Dataset audit & pipeline | In progress (Stage 1) | Audit metadata/lisensi selesai; file dataset belum diakses; dataset belum disetujui |
-| 2 — Baseline NLP | Not started | Menunggu dataset dan split yang tervalidasi |
+| 1 — Dataset audit & pipeline | In progress (Stage 2 complete) | Dataset 600-news Mendeley conditionally approved; loader, validation, preprocessing, split, dan training belum dibuat |
+| 2 — Baseline NLP | Not started | Menunggu Stage 3 (loader, validation, split) dan penerimaan kondisi dataset |
 | 3 — Advanced model & optimization | Not started | Menunggu baseline |
 | 4 — Advanced content intelligence | Not started | Fitur opsional, tidak menghambat baseline |
 | 5 — API & persistence | Not started | Menunggu artifact model |
@@ -127,18 +128,25 @@ Status terbaru dan acceptance criteria ada di [ROADMAP.md](ROADMAP.md).
 
 ## Langkah berikutnya
 
-Phase 1: putuskan dataset kandidat utama dan ajukan akses file. Stage 1
-sudah mengaudit metadata, lisensi, provenance, dan dokumentasi label;
-file aktual, deduplikasi, distribusi kelas, dan split belum diverifikasi.
-Jangan mengarang nama kolom, label, jumlah data, atau metrik.
+Stage 3 belum dimulai. Pemilik perlu menerima kondisi di
+[ADR 0003](docs/decisions/0003-dataset-selection.md) terlebih dahulu.
+Setelah itu: salin dataset ke penyimpanan lokal yang tidak di-commit,
+buat loader dan schema validation untuk CSV 600, bekukan mapping
+baris/URL, tangani konflik label, buat group-aware split, lalu tulis test
+sebelum training. Jangan merge file 250 atau BRIN/Mafindo. Jangan
+mengarang nama kolom, label, jumlah data, atau metrik.
 
 ## Keterbatasan
 
-- Metadata dataset sudah diaudit pada Stage 1; file dataset belum
-  diunduh atau diverifikasi.
-- Belum ada dataset yang disetujui untuk pipeline.
-- Belum ada model, artifact, atau hasil evaluasi.
-- Belum ada API, database, atau dashboard.
-- Label taxonomy dan split strategy belum final.
+- Dataset 600-news sudah diaudit pada Stage 2, tetapi hanya berstatus
+  conditionally approved; hak sumber berita pihak ketiga belum
+  terverifikasi dan penggunaan komersial memerlukan review hukum.
+- Label CSV tidak sepenuhnya identik dengan voting workbook; ada label
+  konflik dan near-duplicate yang harus ditangani sebelum split.
+- CSV tidak memiliki URL, sumber, topik, timestamp, atau ID record.
+- File 250 praktis redundan dan tidak boleh digabungkan.
+- Belum ada model, artifact, API, database, atau dashboard.
+- Split strategy dan preprocessing belum diimplementasikan; Stage 3
+  belum dimulai.
 - Remote Git masih menunjuk ke repository lama; lihat decision record
   Phase 0 sebelum publikasi.

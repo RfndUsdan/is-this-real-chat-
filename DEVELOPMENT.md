@@ -291,28 +291,48 @@ Jika command belum tersedia, buat dan dokumentasikan.
 
 ### 4.1 Sumber dataset awal
 
-Periksa sumber dan lisensi sebelum mengunduh atau mendistribusikan
-ulang.
+Dataset utama MVP: **Mendeley Data `p3hfgr5j3m` versi 1**, hanya
+`600 news with valid hoax label.csv`. Statusnya **conditionally
+approved**; lihat `docs/decisions/0003-dataset-selection.md` untuk audit,
+kondisi, dan batas penggunaan.
 
-1.  BRIN Fake News Mafindo:
-    `https://huggingface.co/datasets/nlp-brin-id/fakenews-mafindo`
-2.  BRIN Indonesian Hoax Report:
-    `https://huggingface.co/datasets/nlp-brin-id/id-hoax-report`
-3.  Open Data fact-checking Jawa Barat:
-    `https://data.go.id/dataset/dataset/data-pengecekan-fakta-fact-checking`
-4.  Dataset tambahan hanya jika memiliki provenance, label, dan izin
-    penggunaan yang jelas.
+Aturan sumber:
 
-Jangan menganggap dataset berbeda dapat langsung digabungkan. Skema
-label, sumber, periode, dan unit analisis mungkin berbeda.
+1.  Gunakan hanya CSV 600 untuk MVP.
+2.  Jangan menggabungkan file 250, BRIN, Mafindo, atau sumber lain pada
+    MVP.
+3.  Jangan memakai `Fact`, `References`, verdict, URL, atau metadata
+    post-hoc sebagai fitur.
+4.  Jangan mempublikasikan ulang raw text tanpa review hak sumber.
+5.  Untuk penggunaan komersial, lakukan review hukum hak berita dan
+    ketentuan Mendeley/Elsevier.
+
+Kandidat lain yang pernah diperiksa pada Stage 1 tetap tercatat di
+`docs/decisions/0002-phase-1-stage-1-dataset-discovery.md`, tetapi
+rekomendasi BRIN di ADR 0002 digantikan untuk pemilihan sumber MVP.
+BRIN Dataverse, HF `fakenews-mafindo`, HF `id-hoax-report`, dan
+`data.go.id` Jabar bukan dataset MVP saat ini. Jangan menganggap dataset
+berbeda dapat langsung digabungkan; skema label, sumber, periode, dan
+unit analisis mungkin berbeda.
+
+- BRIN Fake News Mafindo:
+  `https://huggingface.co/datasets/nlp-brin-id/fakenews-mafindo`
+- BRIN Indonesian Hoax Report:
+  `https://huggingface.co/datasets/nlp-brin-id/id-hoax-report`
+- Open Data fact-checking Jawa Barat:
+  `https://data.go.id/dataset/dataset/data-pengecekan-fakta-fact-checking`
+- Dataset tambahan hanya jika memiliki provenance, label, dan izin
+  penggunaan yang jelas.
 
 ### 4.2 Dataset adapter
 
-Buat adapter terpisah untuk setiap dataset, misalnya: -
-`mafindo_adapter.py` - `id_hoax_report_adapter.py` -
-`jabar_factcheck_adapter.py`
+Buat adapter terpisah untuk setiap dataset. Untuk MVP, adapter yang
+dirancang adalah `mendeley_hoax_adapter.py`; adapter lain tidak dipakai
+pada MVP dan tidak boleh digabungkan.
 
-Setiap adapter mengubah data sumber ke canonical schema HoaxScope.
+Setiap adapter mengubah data sumber ke canonical schema HoaxScope. Jangan
+membuat adapter sebelum loader, schema validation, dan pemetaan record
+Mendeley disetujui pada Stage 3.
 
 ### 4.3 Canonical schema
 
@@ -341,12 +361,19 @@ melakukan mapping.
 
 Jangan mengasumsikan semua dataset memakai definisi label yang sama.
 
-Untuk baseline biner, buat mapping yang eksplisit dan dapat
-dikonfigurasi, contohnya: - `HOAX` → `misleading_or_false` - `NON-HOAX`
-→ `not_flagged_as_hoax`
+Untuk dataset MVP Mendeley:
 
-Nama label kedua sengaja tidak menggunakan `TRUE`, karena NON-HOAX tidak
-selalu berarti setiap klaim telah diverifikasi benar.
+- `Hoax` → `hoax`
+- `Valid` → `not_flagged_as_hoax`
+
+Simpan `label_source` persis seperti di CSV. Nama label
+`not_flagged_as_hoax` sengaja tidak menggunakan `TRUE`, karena `Valid`
+tidak selalu berarti setiap klaim telah diverifikasi benar.
+
+Untuk dataset lain, buat mapping eksplisit dan dapat dikonfigurasi.
+Contoh generik: `HOAX` → `misleading_or_false`; `NON-HOAX` →
+`not_flagged_as_hoax`. Jangan memakai mapping ini untuk dataset Mendeley
+tanpa audit baru.
 
 Untuk label multi-kelas, simpan kategori asli seperti fabricated
 content, false context, false connection, manipulated content,
@@ -1129,7 +1156,7 @@ Jika harus memilih implementasi paling sederhana untuk MVP:
   Baseline terbaik untuk dibandingkan   TF-IDF + Linear SVM
   Advanced model                        IndoBERT
   Metrik utama                          Macro F1
-  Dataset utama                         BRIN Fake News Mafindo
+  Dataset utama                         Mendeley 600-news CSV (conditional)
   API                                   FastAPI
   Dashboard                             Next.js
   Database                              PostgreSQL
