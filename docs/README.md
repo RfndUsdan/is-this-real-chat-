@@ -30,6 +30,11 @@ Decision records:
 - Phase 1 Stage 2 (dataset selection/audit, conditional approval):
   [decisions/0003-dataset-selection.md](decisions/0003-dataset-selection.md).
 
+Experiment reports:
+
+- Phase 1 Stage 3 (canonical schema & data pipeline):
+  [experiments/stage-3-data-pipeline.md](experiments/stage-3-data-pipeline.md).
+
 ADR 0002 tetap menjadi catatan sejarah Stage 1. Rekomendasi BRIN di
 dalamnya digantikan untuk pemilihan sumber MVP oleh ADR 0003; isi ADR
 0002 tidak dihapus.

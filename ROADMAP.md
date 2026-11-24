@@ -1,12 +1,12 @@
 # HoaxScope --- Development Roadmap
 
 > Status awal semua fase adalah **Not started**. Perbarui hanya
-> berdasarkan implementasi dan validasi aktual. Per 2026-11-16, Phase 0
-> berstatus **Done**; Phase 1 berstatus **In progress** (Stage 2
-> dataset selection/audit selesai); Phase 2–7 belum dimulai. Dataset
-> Mendeley 600-news berstatus **conditionally approved**; Stage 3
-> belum dimulai. File audit hanya berada di direktori sementara, bukan
-> di repository.
+> berdasarkan implementasi dan validasi aktual. Per 2026-11-24, Phase 0
+> berstatus **Done**; Phase 1 berstatus **Done** (Stage 1 discovery, Stage 2
+> dataset selection/audit, dan Stage 3 canonical schema/data pipeline
+> selesai); Phase 2–7 belum dimulai. Dataset Mendeley 600-news tetap
+> **conditionally approved** dan belum boleh dipakai untuk training tanpa
+> persetujuan Phase 2. File dataset mentah tetap di luar repository.
 
 ## Prinsip
 
@@ -33,12 +33,13 @@ tersedia. - \[x\] Tidak membangun seluruh aplikasi pada fase ini.
 
 ## Phase 1 --- Dataset audit & pipeline
 
-**Status:** In progress (2026-11-16). Stage 1 discovery/audit dan Stage 2
-dataset selection/audit selesai. Dataset Mendeley `p3hfgr5j3m` versi 1
-(600 CSV) **conditionally approved**; Stage 3 (loader, validation,
-preprocessing, split) belum dimulai. Evidence:
-[ADR 0002](docs/decisions/0002-phase-1-stage-1-dataset-discovery.md) dan
-[ADR 0003](docs/decisions/0003-dataset-selection.md).
+**Status:** Done (2026-11-24). Stage 1 discovery/audit, Stage 2 dataset
+selection/audit, dan Stage 3 canonical schema/data pipeline selesai.
+Dataset Mendeley `p3hfgr5j3m` versi 1 (600 CSV) **conditionally approved**;
+training Phase 2 masih menunggu persetujuan pemilik. Evidence:
+[ADR 0002](docs/decisions/0002-phase-1-stage-1-dataset-discovery.md),
+[ADR 0003](docs/decisions/0003-dataset-selection.md), dan
+[laporan Stage 3](docs/experiments/stage-3-data-pipeline.md).
 
 **Stage 1 evidence (2026-11-14):**
 
@@ -71,6 +72,23 @@ preprocessing, split) belum dimulai. Evidence:
 - Keputusan: conditionally approved; lihat ADR 0003 untuk kondisi dan
   batas penggunaan.
 
+**Stage 3 evidence (2026-11-24):**
+
+- Loader CP1252 strict, canonical schema berbasis row-position ID, dan
+  validasi baseline 600/372/228 lolos tanpa perubahan data.
+- Workbook row-order audit mereproduksi 567 URL unik, 31 grup duplikat/64
+  baris, dan 9 perbedaan voting; tetap diperlakukan sebagai inferensi,
+  bukan relasi resmi.
+- Near-duplicate 5-word/Jaccard ≥ 0.5 mereproduksi 332 pasangan, 91
+  komponen, komponen terbesar 16, dan 27 komponen dengan konflik label.
+- Gabungan URL + near-duplicate menghasilkan 431 komponen; 29 komponen
+  berkonflik sehingga 92 record dikarantina, bukan dihapus.
+- Preprocessing modular NFKC/HTML/URL-placeholder/whitespace tanpa
+  stemming atau stopword removal otomatis.
+- Split group-aware seed `20261124`: 508 record layak, 402 grup,
+  356/76/76 train/validation/test; 6/6 leakage check lulus.
+- 20 unit test dengan fixture sintetis lulus; raw dataset tidak di-commit.
+
 **Tujuan:** dataset tervalidasi dan dapat ditelusuri. - Verifikasi
 sumber, lisensi, provenance, schema, dan label. - Buat loader CSV/JSON
 dan schema validation. - Audit missing values, distribusi kelas,
@@ -81,15 +99,18 @@ Acceptance criteria: - \[x\] Sumber/lisensi/provenance terdokumentasi
 (dengan catatan hak pihak ketiga). - \[x\] Schema dan label aktual
 terdokumentasi (tanpa codebook rinci). - \[x\] Data quality report
 dijalankan dan metode/hash dicatat. - \[x\] Duplikasi dan leakage
-diperiksa. - \[x\] Split strategy group-aware memiliki alasan (belum
-diimplementasikan). - \[ \] Test loader/preprocessing tersedia.
+diperiksa. - \[x\] Split strategy group-aware diimplementasikan dan lolos
+seluruh leakage check. - \[x\] Loader, validasi, preprocessing, dan 20 unit
+test tersedia dengan fixture sintetis. - \[x\] Raw text dan dataset tidak
+di-commit.
 
-Stage 3 belum dimulai. Stage ini hanya boleh dimulai setelah pemilik
-menerima kondisi ADR 0003; hasilnya harus mencakup loader, schema
-validation, pemetaan record, group-aware split, preprocessing, dan test
-sebelum baseline Phase 2.
+Stage 3 selesai dan tidak melanjutkan ke training. Phase 2 baru boleh
+dimulai setelah pemilik menyetujui penggunaan dataset dan benchmark.
 
 ## Phase 2 --- Baseline NLP
+
+**Status:** Not started. Menunggu persetujuan pemilik untuk memakai dataset
+dan benchmark hasil Stage 3.
 
 **Tujuan:** baseline pembanding yang reproducible. - TF-IDF +
 MultinomialNB. - TF-IDF + Logistic Regression. - TF-IDF + LinearSVC. -

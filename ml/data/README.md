@@ -12,13 +12,28 @@ ml/data/
 
 ## Status
 
-Belum ada file dataset yang disalin ke folder ini. Audit Stage 2 memakai
-salinan sementara di luar repository; tidak ada CSV/XLSX yang di-commit.
-Dataset Mendeley 600-news berstatus **conditionally approved**; hasil
-audit dan kondisinya ada di
+Tidak ada CSV/XLSX yang disalin atau di-commit ke folder ini. Dataset
+dibaca dari lokasi sementara di luar repository; teks mentah hanya ada
+dalam memori proses dan penyimpanan lokal yang diabaikan Git.
+
+Stage 3 selesai pada 2026-11-24. Pipeline menulis laporan JSON yang sudah
+tanpa raw text/URL ke `ml/data/processed/` (diabaikan Git):
+
+```text
+stage3-validation.json
+stage3-workbook-audit.json
+stage3-dedup.json
+stage3-quarantine.json
+stage3-split.json
+stage3-preprocessing.json
+stage3-summary.json
+```
+
+Hasil dan keterbatasannya ada di
+[`docs/experiments/stage-3-data-pipeline.md`](../../docs/experiments/stage-3-data-pipeline.md).
+Kondisi dataset tetap mengikuti
 [`docs/decisions/0003-dataset-selection.md`](../../docs/decisions/0003-dataset-selection.md).
-Stage 3 (loader, schema validation, preprocessing, split) belum dimulai.
-Folder ini hanya berisi penanda `.gitkeep`.
+Folder sumber tetap hanya berisi penanda `.gitkeep`.
 
 ## Aturan
 
@@ -43,9 +58,23 @@ Kandidat Stage 1 dan rekomendasi lama ada di
 rekomendasi BRIN di ADR 0002 digantikan untuk pemilihan sumber MVP.
 [`DATASET.md`](../../DATASET.md) adalah register kanonik.
 
+## Menjalankan pipeline
+
+```powershell
+python ml/scripts/run_stage3_pipeline.py `
+  --csv "<path ke 600 news with valid hoax label.csv>" `
+  --workbook "<path ke 600 news labelling process.xlsx>" `
+  --output-dir ml/data/processed
+```
+
+Unit test memakai fixture sintetis dan tidak memerlukan dataset asli:
+
+```powershell
+python -m unittest discover -s ml/tests -v
+```
+
 ## Langkah berikutnya
 
-Stage 3 belum dimulai. Setelah pemilik menerima kondisi ADR 0003, baru
-dibuat loader, schema validation, pemetaan record, group-aware split,
-serta preprocessing dan test. Jangan mulai training sebelum split dan
-leakage test tersedia.
+Stage 3 sudah selesai. Training Phase 2 belum boleh dimulai tanpa
+persetujuan pemilik. Jika disetujui, gunakan split dan daftar karantina
+dari laporan Stage 3, bukan split acuan dari file 250.

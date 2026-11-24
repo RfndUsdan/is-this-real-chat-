@@ -10,10 +10,13 @@
 Dataset utama MVP: **Mendeley Data `p3hfgr5j3m` versi 1**, hanya file
 `600 news with valid hoax label.csv`.
 
-Status keputusan: **CONDITIONALLY APPROVED**. Dataset boleh dipakai untuk
-tahap perancangan pipeline setelah kondisi di ADR 0003 diterima, tetapi
-belum boleh dipakai untuk training sampai Stage 3 menyelesaikan loader,
-validasi, pemetaan record, dan group-aware split.
+Status keputusan: **CONDITIONALLY APPROVED** dengan kondisi ADR 0003
+diterima pemilik. Stage 3 selesai pada 2026-11-24: loader CP1252, canonical
+schema, validasi baseline, row-order workbook audit, deduplikasi/konflik,
+preprocessing modular, dan group-aware split telah diimplementasikan serta
+diuji. Dataset **belum boleh dipakai untuk training** sampai pemilik
+menyetujui Phase 2. Hasil audit:
+[laporan Stage 3](docs/experiments/stage-3-data-pipeline.md).
 
 Batas penting:
 
@@ -25,7 +28,8 @@ Batas penting:
 - Raw text tidak boleh di-commit atau ditampilkan ulang sebagai dataset
   publik tanpa review hak.
 
-Pipeline data, model, API, dan dashboard belum diimplementasikan.
+Pipeline data Stage 3 tersedia di `ml/src/hoaxscope_ml`; model, API,
+dan dashboard belum diimplementasikan.
 
 ## 2. Register dataset
 
@@ -193,7 +197,10 @@ bukti performa atau split yang reproducible.
 - Satu URL dapat memiliki dua versi teks dan dua label yang berbeda.
 - File 250 praktis tercakup di 600; jangan merge.
 
-Pemetaan CSV↔workbook harus dibekukan dan diuji pada Stage 3. Jangan
+Pemetaan CSV↔workbook telah dibekukan pada Stage 3 sebagai inferensi urutan
+baris (`row_order_inference_12x50`) dan diverifikasi terhadap baseline:
+600 link terpetakan, 567 URL unik, 31 grup duplikat/64 baris, dan 9
+perbedaan label CSV vs voting. Ini tetap **bukan relasi resmi**; jangan
 menganggap URL atau topik dapat diambil langsung dari CSV.
 
 ## 7. Duplikasi dan leakage
@@ -228,7 +235,8 @@ split wajib memakai URL dan komponen near-duplicate; detail ada di ADR
 
 ## 8. Preprocessing policy
 
-Belum ada preprocessing yang diimplementasikan. Rencana minimum Stage 3:
+Stage 3 mengimplementasikan preprocessing modular berikut. Urutan dan
+defaultnya dapat direproduksi lewat `PreprocessingConfig`:
 
 1. Baca CSV dengan encoding `cp1252` dan delimiter `;`.
 2. Validasi header, jumlah kolom, label, dan teks kosong.
@@ -244,7 +252,8 @@ statistik) hanya boleh fit pada training split.
 
 ## 9. Split dan evaluation policy
 
-Belum diimplementasikan. Arah keputusan:
+Stage 3 mengimplementasikan split group-aware dengan seed `20261124`.
+Keputusan dan hasil aktual:
 
 - Dataset: CSV 600, label final dibekukan.
 - Group key: URL exact dari workbook jika mapping urutan dipakai, plus
@@ -258,6 +267,12 @@ Belum diimplementasikan. Arah keputusan:
 - Laporkan sensitivity analysis untuk record konflik, bukan memilih
   angka yang paling bagus setelah melihat test.
 - Jangan memakai file experiment 250 sebagai split acuan.
+
+Hasil aktual Stage 3: 92 record dengan konflik label dalam komponen duplikat
+dikarantina, sehingga 508 record layak dibagi. Terdapat 402 grup; seed
+`20261124` menghasilkan 356 train / 76 validation / 76 test dengan
+distribusi label `hoax` 133/28/29 dan `not_flagged_as_hoax` 223/48/47.
+Seluruh enam leakage check lulus.
 
 ## 10. Bias dan keterbatasan
 
@@ -296,15 +311,16 @@ Source(s): Mendeley Data, DOI 10.17632/p3hfgr5j3m.1
 Access date: 2026-11-16
 License: CC BY 4.0; third-party content caveat
 Raw records: 600 (600 CSV), 250 (not used)
-Records after validation: belum; Stage 3
+Records after validation: 600 (lolos baseline Stage 2)
+Eligible after conflict quarantine: 508 (92 dikarantina)
 Label mapping: Hoax -> hoax; Valid -> not_flagged_as_hoax
-Label source preserved: ya, label_source
-Duplicate handling: group URL + near-duplicate; record konflik dikeluarkan/diuji terpisah
-Preprocessing version: belum ada
-Split strategy: group-aware 70/15/15 (rencana; belum diimplementasikan)
-Random seed: belum ditetapkan
+Label source preserved: ya, source_label
+Duplicate handling: group URL + near-duplicate via connected components; record konflik dikarantina, bukan dihapus
+Preprocessing version: Stage 3 (NFKC, HTML cleanup, URL placeholder, whitespace; lowercase/tokenization optional)
+Split strategy: group-aware 70/15/15, greedy stratified, 402 grup
+Random seed: 20261124
 Known limitations: label noise, URL conflicts, near-duplicate, no timestamp/source
-Prepared by: HoaxScope Stage 2 audit
+Prepared by: HoaxScope Stage 2 audit + Stage 3 pipeline (2026-11-24)
 ```
 
 ## 13. Checklist status
@@ -318,16 +334,18 @@ Prepared by: HoaxScope Stage 2 audit
 | Definisi label dipahami | Sebagian; tidak ada codebook rinci |
 | Data quality audit dijalankan | Ya |
 | Duplikasi dan leakage diperiksa | Ya |
-| Split strategy ditetapkan | Kebijakan awal; belum diimplementasikan |
+| Split strategy ditetapkan | Ya; group-aware 70/15/15, seed `20261124`, 6/6 leakage check lulus |
+| Loader/validasi/preprocessing/split diimplementasikan | Ya; Stage 3, 20 unit test lulus |
 | Provenance dan versi dicatat | Ya |
 | Bias dan keterbatasan didokumentasikan | Ya |
 | Review hukum komersial | Belum |
-| Penerimaan kondisi ADR 0003 | Belum; Stage 3 belum dimulai |
+| Penerimaan kondisi ADR 0003 | Diterima pemilik; Stage 3 selesai, Phase 2 masih menunggu persetujuan |
 
 ## 14. Referensi
 
 - [ADR 0003 — dataset selection & audit](docs/decisions/0003-dataset-selection.md)
 - [ADR 0002 — Stage 1 dataset discovery](docs/decisions/0002-phase-1-stage-1-dataset-discovery.md)
+- [Laporan audit Stage 3 — canonical schema & data pipeline](docs/experiments/stage-3-data-pipeline.md)
 - Mendeley dataset: <https://data.mendeley.com/datasets/p3hfgr5j3m/1>
 - CC BY 4.0: <https://creativecommons.org/licenses/by/4.0/>
 - Mendeley Terms: <https://www.mendeley.com/terms/>

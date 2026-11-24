@@ -7,14 +7,15 @@ berbahasa Indonesia menggunakan NLP dan machine learning. Hasil sistem
 adalah **prediksi model berdasarkan pola pada dataset**, bukan verifikasi
 fakta dan bukan bukti bahwa suatu klaim benar atau salah.
 
-> **Status repository:** Phase 0 selesai. Phase 1 Stage 1 (discovery)
-> dan Stage 2 (dataset selection/audit) selesai; dataset Mendeley
-> 600-news berstatus **CONDITIONALLY APPROVED**. Lihat
-> [ADR 0003](docs/decisions/0003-dataset-selection.md). Stage 3 (loader,
-> validation, preprocessing, split) **belum dimulai**. Pipeline data,
-> model, API, dan dashboard belum diimplementasikan. Tidak ada file
-> dataset, model, artifact, atau metrik evaluasi di repository; audit
-> memakai salinan sementara di luar repo.
+> **Status repository:** Phase 0 dan Phase 1 selesai. Stage 1 discovery,
+> Stage 2 dataset selection/audit, dan Stage 3 canonical schema/data
+> pipeline telah diselesaikan; dataset Mendeley 600-news tetap
+> **CONDITIONALLY APPROVED**. Lihat
+> [ADR 0003](docs/decisions/0003-dataset-selection.md) dan
+> [laporan Stage 3](docs/experiments/stage-3-data-pipeline.md). Training
+> Phase 2, model, API, dan dashboard belum diimplementasikan. Tidak ada
+> file dataset, model, artifact, atau metrik evaluasi di repository; data
+> mentah tetap dibaca dari lokasi sementara di luar repo.
 
 ## Responsible use
 
@@ -116,8 +117,8 @@ Copy-Item .env.example .env
 | Phase | Status | Catatan |
 | --- | --- | --- |
 | 0 — Repository inspection & planning | Done | Struktur minimum, dokumentasi fondasi, dan rencana tersedia |
-| 1 — Dataset audit & pipeline | In progress (Stage 2 complete) | Dataset 600-news Mendeley conditionally approved; loader, validation, preprocessing, split, dan training belum dibuat |
-| 2 — Baseline NLP | Not started | Menunggu Stage 3 (loader, validation, split) dan penerimaan kondisi dataset |
+| 1 — Dataset audit & pipeline | Done | Stage 3 selesai: loader CP1252, canonical schema, validasi, dedup/konflik, preprocessing, group-aware split, 20 test lulus |
+| 2 — Baseline NLP | Not started | Menunggu persetujuan pemilik untuk training dengan split Stage 3 |
 | 3 — Advanced model & optimization | Not started | Menunggu baseline |
 | 4 — Advanced content intelligence | Not started | Fitur opsional, tidak menghambat baseline |
 | 5 — API & persistence | Not started | Menunggu artifact model |
@@ -128,13 +129,17 @@ Status terbaru dan acceptance criteria ada di [ROADMAP.md](ROADMAP.md).
 
 ## Langkah berikutnya
 
-Stage 3 belum dimulai. Pemilik perlu menerima kondisi di
-[ADR 0003](docs/decisions/0003-dataset-selection.md) terlebih dahulu.
-Setelah itu: salin dataset ke penyimpanan lokal yang tidak di-commit,
-buat loader dan schema validation untuk CSV 600, bekukan mapping
-baris/URL, tangani konflik label, buat group-aware split, lalu tulis test
-sebelum training. Jangan merge file 250 atau BRIN/Mafindo. Jangan
-mengarang nama kolom, label, jumlah data, atau metrik.
+Stage 3 sudah selesai dan berhenti sebelum training. Pemilik perlu
+menyetujui Phase 2 dengan dataset dan split yang telah dibekukan. Untuk
+menjalankan ulang audit:
+
+```powershell
+python -m unittest discover -s ml/tests -v
+python ml/scripts/run_stage3_pipeline.py --csv "<csv 600>" --workbook "<workbook 600>" --output-dir ml/data/processed
+```
+
+Jangan merge file 250 atau BRIN/Mafindo. Jangan mengarang nama kolom,
+label, jumlah data, atau metrik.
 
 ## Keterbatasan
 
@@ -146,7 +151,7 @@ mengarang nama kolom, label, jumlah data, atau metrik.
 - CSV tidak memiliki URL, sumber, topik, timestamp, atau ID record.
 - File 250 praktis redundan dan tidak boleh digabungkan.
 - Belum ada model, artifact, API, database, atau dashboard.
-- Split strategy dan preprocessing belum diimplementasikan; Stage 3
-  belum dimulai.
+- Stage 3 sudah menyediakan preprocessing dan split group-aware, tetapi
+  hasilnya belum diuji pada training/evaluasi model.
 - Remote Git masih menunjuk ke repository lama; lihat decision record
   Phase 0 sebelum publikasi.
